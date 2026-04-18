@@ -49,6 +49,7 @@ public class Win32 {
     public const uint WM_LBUTTONUP = 0x0202;
     public const int SW_RESTORE = 9;
     public const int SW_SHOW = 5;
+    public const int SW_MAXIMIZE = 3;
 }
 "@
 
@@ -61,20 +62,25 @@ $CHECKIN_Y = 444
 Write-Host "=== WorkBuddy Auto Check-in v3 ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Get WorkBuddy window
-$hwnd = [IntPtr]2492602
+# Find WorkBuddy window dynamically
+$process = Get-Process | Where-Object { $_.MainWindowTitle -eq "WorkBuddy" -and $_.MainWindowHandle -ne 0 } | Select-Object -First 1
 
-if ($hwnd -eq [IntPtr]::Zero) {
+if (-not $process) {
     Write-Host "[Error] WorkBuddy window not found" -ForegroundColor Red
     exit 1
 }
 
-# Step 1: Restore and activate window
-Write-Host "[1/5] Restoring and activating window..." -ForegroundColor Yellow
+$hwnd = $process.MainWindowHandle
+Write-Host "Found WorkBuddy window: Handle = $hwnd" -ForegroundColor Green
+
+# Step 1: Maximize and activate window
+Write-Host "[1/5] Maximizing and activating window..." -ForegroundColor Yellow
 if ([Win32]::IsIconic($hwnd)) {
     [Win32]::ShowWindow($hwnd, [Win32]::SW_RESTORE) | Out-Null
     Start-Sleep -Milliseconds 500
 }
+[Win32]::ShowWindow($hwnd, [Win32]::SW_MAXIMIZE) | Out-Null
+Start-Sleep -Milliseconds 500
 [Win32]::ShowWindow($hwnd, [Win32]::SW_SHOW) | Out-Null
 Start-Sleep -Milliseconds 200
 [Win32]::BringWindowToTop($hwnd) | Out-Null
@@ -83,7 +89,7 @@ Start-Sleep -Milliseconds 100
 Start-Sleep -Milliseconds 300
 [Win32]::SetActiveWindow($hwnd) | Out-Null
 Start-Sleep -Milliseconds 200
-Write-Host "    Window activated" -ForegroundColor Green
+Write-Host "    Window maximized and activated" -ForegroundColor Green
 
 # Step 2: Click user menu
 Write-Host "[2/5] Clicking user menu ($MENU_X, $MENU_Y)..." -ForegroundColor Yellow
