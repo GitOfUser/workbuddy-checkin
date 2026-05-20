@@ -1,5 +1,7 @@
 # WorkBuddy Check-in Script v3
 # Enhanced window activation
+# NOTE: This PowerShell script may fail in environments where system environment variables
+# exceed 65535 bytes (Add-Type limitation). Use checkin_py.py instead.
 
 Add-Type @"
 using System;
@@ -53,11 +55,11 @@ public class Win32 {
 }
 "@
 
-# Check-in coordinates
+# Check-in coordinates (verified at 1920x1080)
 $MENU_X = 207
 $MENU_Y = 983
-$CHECKIN_X = 333
-$CHECKIN_Y = 444
+$CHECKIN_X = 93
+$CHECKIN_Y = 566
 
 Write-Host "=== WorkBuddy Auto Check-in v3 ===" -ForegroundColor Cyan
 Write-Host ""
